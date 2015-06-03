@@ -6,6 +6,7 @@
 class JsonItem():
     def __init__(self, key, value):
         self.__value = None
+        self.parent = None
         self.key = key
         self.value = value
 
@@ -15,3 +16,6 @@ class JsonItem():
 
     def __eq__(self, other):
         return self.key == other.key
+
+    def __len__(self):
+        return 0

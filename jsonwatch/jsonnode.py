@@ -9,7 +9,9 @@ from jsonwatch.jsonitem import JsonItem
 class JsonNode():
     def __init__(self, key):
         self.key = key
+        self.parent = None
         self.__children = {}
+        self.__keys = []
 
     def __len__(self):
         return len(self.__children)
@@ -27,9 +29,11 @@ class JsonNode():
                 if isinstance(value, dict):
                     new_node = JsonNode(key)
                     new_node.__data_from_dict(value)
+                    new_node.parent = self
                     self.__children[key] = new_node
                 else:
                     new_item = JsonItem(key, value)
+                    new_item.parent = self
                     self.__children[key] = new_item
             else:
                 if isinstance(child, JsonNode) and isinstance(value, dict):
@@ -37,10 +41,27 @@ class JsonNode():
                 elif isinstance(child, JsonItem):
                     child.value = value
 
-    def data_from_string(self, jsonstr):
+        self.__keys = sorted(list(self.__children.keys()))
+
+    def data_from_json(self, jsonstr):
         try:
             jsondata = json.loads(jsonstr)
         except ValueError as e:
-            raise e
+            raise ValueError("Corrupt Json string")
         else:
             self.__data_from_dict(jsondata)
+
+    @property
+    def keys(self):
+        return self.__keys
+
+    def item_at(self, index):
+        key = self.__keys[index]
+        return self.__children[key]
+
+    def index(self, item):
+        for i, key in enumerate(self.keys):
+            child = self.__children[key]
+            if child == item:
+                return i
+        raise ValueError("%s is not in list" % repr(child))

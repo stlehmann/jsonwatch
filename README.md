@@ -1,2 +1,2 @@
 # jsonwatch
-package for keeping track of data provided by a json string
+Comfortable way of keeping track of Json data.
