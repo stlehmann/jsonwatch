@@ -6,12 +6,22 @@ import pytest
 from jsonwatch.jsonitem import JsonItem
 from jsonwatch.jsonnode import JsonNode
 
+simple_json_string = '{"item1": 1, "item2": 2}'
+nested_json_string = ('\n'
+                      '    {\n'
+                      '        "item1": 1,\n'
+                      '        "item2": 2,\n'
+                      '        "item3": {\n'
+                      '            "item1": 1,\n'
+                      '            "item2": 2\n'
+                      '        }\n'
+                      '    }')
 
 @pytest.fixture
 def simple_json():
     from jsonwatch.jsonnode import JsonNode
     node = JsonNode('root')
-    node.data_from_json('{"item1": 1, "item2": 2}')
+    node.data_from_json(simple_json_string)
     return node
 
 def test_simple_len(simple_json):
@@ -34,20 +44,16 @@ def test_simple_updateitems(simple_json):
     assert node["item1"].value == 3
     assert node["item2"].value == 4
 
+def test_data_to_json(simple_json):
+    node = simple_json
+    jsonstr = node.data_to_json()
+    assert jsonstr == simple_json_string
 
 @pytest.fixture
 def nested_json():
     from jsonwatch.jsonnode import JsonNode
     node = JsonNode('root')
-    node.data_from_json('''
-    {
-        "item1": 1,
-        "item2": 2,
-        "item3": {
-            "item1": 1,
-            "item2": 2
-        }
-    }''')
+    node.data_from_json(nested_json_string)
     return node
 
 def test_nested_len(nested_json):
@@ -117,6 +123,10 @@ def test_index(nested_json):
     with pytest.raises(ValueError) as e:
         node.index(noitem) == None
     assert "is not in list" in str(e.value)
+
+def test_repr(nested_json):
+    node = nested_json
+    assert repr(node) == "<JsonNode object key:'root', children:3>"
 
 def test_corruptjson():
     node = JsonNode('root')
