@@ -2,10 +2,11 @@
     Copyright © 2015 by Stefan Lehmann
 
 """
-from pandas import json
 import pytest
+import json
 from jsonwatch.jsonitem import JsonItem
 from jsonwatch.jsonnode import JsonNode
+
 
 simple_json_string = '{"item1": 1, "item2": 2}'
 nested_json_string = ('\n'
@@ -17,6 +18,7 @@ nested_json_string = ('\n'
                       '            "item2": 2\n'
                       '        }\n'
                       '    }')
+
 
 @pytest.fixture
 def simple_json():
@@ -140,3 +142,19 @@ def test_corruptjson():
         }
         ''')
     assert 'Corrupt Json string' in str(e.value)
+
+def test_latest(nested_json):
+    node = nested_json
+    new_json_string = ('\n'
+                      '    {\n'
+                      '        "item1": 1,\n'
+                      '        "item3": {\n'
+                      '            "item1": 1\n'
+                      '        }\n'
+                      '    }')
+    node.data_from_json(new_json_string)
+    assert node["item1"].latest
+    assert not node["item2"].latest
+    assert node["item3"].latest
+    assert node["item3"]["item1"].latest
+    assert not node["item3"]["item2"].latest

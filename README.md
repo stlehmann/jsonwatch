@@ -1,2 +1,2 @@
 # jsonwatch
-Comfortable way of keeping track of Json data.
+Comfortable way of keeping track of your Json data.

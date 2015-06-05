@@ -16,6 +16,7 @@ class JsonNode():
         self.key = key
         self.parent = None
         self.child_added_callback = None
+        self.latest = True
         self.__children = []
 
     def __len__(self):
@@ -32,6 +33,14 @@ class JsonNode():
                (self.key, len(self))
 
     def __data_from_dict(self, jsondict):
+        def iter_reset_latest(parent):
+            for key, child in parent.__children:
+                child.latest = False
+                if isinstance(child, JsonNode): iter_reset_latest(child)
+
+        # reset the *latest* flag of all children
+        iter_reset_latest(self)
+
         for key, value in jsondict.items():
             child = self.child_with_key(key)
             if child is None:
@@ -48,12 +57,12 @@ class JsonNode():
                 # run callback function
                 if self.child_added_callback is not None:
                     self.child_added_callback(child)
-
             else:
                 if isinstance(child, JsonNode) and isinstance(value, dict):
                     child.__data_from_dict(value)
                 elif isinstance(child, JsonItem):
                     child.value = value
+        self.latest = True
 
     def __data_to_dict(self):
         def iter_children(parent):
