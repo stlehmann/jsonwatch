@@ -4,6 +4,11 @@
 """
 import json
 from jsonwatch.jsonitem import JsonItem
+import bisect
+
+
+key = lambda x: x[0]
+itm = lambda x: x[1]
 
 
 class JsonNode():
@@ -11,17 +16,16 @@ class JsonNode():
         self.key = key
         self.parent = None
         self.child_added_callback = None
-        self.__children = {}
-        self.__keys = []
+        self.__children = []
 
     def __len__(self):
         return len(self.__children)
 
     def __getitem__(self, key):
-        return self.__children.get(key)
+        return self.child_with_key(key)
 
     def __iter__(self):
-        return iter(self.__children.values())
+        return (itm(child) for child in self.__children)
 
     def __repr__(self):
         return "<JsonNode object key:'%s', children:%i>" % \
@@ -29,7 +33,7 @@ class JsonNode():
 
     def __data_from_dict(self, jsondict):
         for key, value in jsondict.items():
-            child = self.__children.get(key)
+            child = self.child_with_key(key)
             if child is None:
                 # node or item?
                 if isinstance(value, dict):
@@ -38,12 +42,8 @@ class JsonNode():
                 else:
                     child = JsonItem(key, value)
 
-                # add new child to children
-                child.parent = self
-                self.__children[key] = child
-
-                # create keys
-                self.__keys = sorted(list(self.__children.keys()))
+                # add new child
+                self.add_child(child)
 
                 # run callback function
                 if self.child_added_callback is not None:
@@ -58,13 +58,17 @@ class JsonNode():
     def __data_to_dict(self):
         def iter_children(parent):
             jsondict = {}
-            for key, child in parent.__children.items():
+            for key, child in parent.__children:
                 if isinstance(child, JsonNode):
                     jsondict[key] = iter_children(child)
                 else:
                     jsondict[key] = child.value
             return jsondict
         return iter_children(self)
+
+    def add_child(self, child):
+        child.parent = self
+        bisect.insort(self.__children, (child.key, child))
 
     def data_from_json(self, jsonstr):
         try:
@@ -81,15 +85,21 @@ class JsonNode():
 
     @property
     def keys(self):
-        return self.__keys
+        return list(map(key, self.__children))
 
-    def item_at(self, index):
-        key = self.__keys[index]
-        return self.__children[key]
+    def child_at(self, index):
+        return itm(self.__children[index])
+
+    def child_with_key(self, key):
+        try:
+            return next((v for k, v in self.__children if k == key))
+        except StopIteration:
+            return None
 
     def index(self, item):
-        for i, key in enumerate(self.keys):
-            child = self.__children[key]
-            if child == item:
-                return i
-        raise ValueError("%s is not in list" % repr(item))
+        res = (i for (i, child) in enumerate(self.__children)
+               if itm(child) == item)
+        try:
+            return next(res)
+        except StopIteration:
+            raise ValueError("%s is not in list" % repr(item))

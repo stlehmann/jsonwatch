@@ -2,6 +2,7 @@
     Copyright © 2015 by Stefan Lehmann
 
 """
+from pandas import json
 import pytest
 from jsonwatch.jsonitem import JsonItem
 from jsonwatch.jsonnode import JsonNode
@@ -47,7 +48,7 @@ def test_simple_updateitems(simple_json):
 def test_data_to_json(simple_json):
     node = simple_json
     jsonstr = node.data_to_json()
-    assert jsonstr == simple_json_string
+    assert json.loads(jsonstr) == json.loads(simple_json_string)
 
 @pytest.fixture
 def nested_json():
@@ -107,9 +108,9 @@ def test_keys(nested_json):
 
 def test_item_at(nested_json):
     node = nested_json
-    assert node.item_at(0).key == "item1"
-    assert node.item_at(1).key == "item2"
-    assert node.item_at(2).key == "item3"
+    assert node.child_at(0).key == "item1"
+    assert node.child_at(1).key == "item2"
+    assert node.child_at(2).key == "item3"
 
 def test_index(nested_json):
     node = nested_json
