@@ -2,13 +2,13 @@
     Copyright © 2015 by Stefan Lehmann
 
 """
+from jsonwatch.abstractjsonitem import AbstractJsonItem
 
 
-class JsonItem():
+class JsonItem(AbstractJsonItem):
     def __init__(self, key, value):
+        super().__init__(key)
         self.__value = None
-        self.parent = None
-        self.key = key
         self.value = value
         self.latest = True
 

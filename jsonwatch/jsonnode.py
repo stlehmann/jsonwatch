@@ -3,6 +3,7 @@
 
 """
 import json
+from jsonwatch.abstractjsonitem import AbstractJsonItem
 from jsonwatch.jsonitem import JsonItem
 import bisect
 
@@ -11,13 +12,15 @@ key = lambda x: x[0]
 itm = lambda x: x[1]
 
 
-class JsonNode():
-    def __init__(self, key):
-        self.key = key
-        self.parent = None
+class JsonNode(AbstractJsonItem):
+    def __init__(self, key: str, jsonstr: str=None):
+        super().__init__(key)
         self.child_added_callback = None
         self.latest = True
         self.__children = []
+
+        if jsonstr is not None:
+            self.from_json(jsonstr)
 
     def __len__(self):
         return len(self.__children)
@@ -32,7 +35,7 @@ class JsonNode():
         return "<JsonNode object key:'%s', children:%i>" % \
                (self.key, len(self))
 
-    def __data_from_dict(self, jsondict):
+    def __from_dict(self, jsondict):
         def iter_reset_latest(parent):
             for key, child in parent.__children:
                 child.latest = False
@@ -47,7 +50,7 @@ class JsonNode():
                 # node or item?
                 if isinstance(value, dict):
                     child = JsonNode(key)
-                    child.__data_from_dict(value)
+                    child.__from_dict(value)
                 else:
                     child = JsonItem(key, value)
 
@@ -59,12 +62,12 @@ class JsonNode():
                     self.child_added_callback(child)
             else:
                 if isinstance(child, JsonNode) and isinstance(value, dict):
-                    child.__data_from_dict(value)
+                    child.__from_dict(value)
                 elif isinstance(child, JsonItem):
                     child.value = value
         self.latest = True
 
-    def __data_to_dict(self):
+    def __to_dict(self):
         def iter_children(parent):
             jsondict = {}
             for key, child in parent.__children:
@@ -79,16 +82,16 @@ class JsonNode():
         child.parent = self
         bisect.insort(self.__children, (child.key, child))
 
-    def data_from_json(self, jsonstr):
+    def from_json(self, jsonstr):
         try:
             jsondata = json.loads(jsonstr)
         except ValueError as e:
             raise ValueError("Corrupt Json string")
         else:
-            self.__data_from_dict(jsondata)
+            self.__from_dict(jsondata)
 
-    def data_to_json(self):
-        jsondict = self.__data_to_dict()
+    def to_json(self):
+        jsondict = self.__to_dict()
         jsonstr = json.dumps(jsondict)
         return jsonstr
 
@@ -112,3 +115,6 @@ class JsonNode():
             return next(res)
         except StopIteration:
             raise ValueError("%s is not in list" % repr(item))
+
+    def update(self, other):
+        self.from_json(other.to_json())

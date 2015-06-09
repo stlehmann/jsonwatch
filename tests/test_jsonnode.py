@@ -24,7 +24,7 @@ nested_json_string = ('\n'
 def simple_json():
     from jsonwatch.jsonnode import JsonNode
     node = JsonNode('root')
-    node.data_from_json(simple_json_string)
+    node.from_json(simple_json_string)
     return node
 
 def test_simple_len(simple_json):
@@ -43,20 +43,20 @@ def test_simple_values(simple_json):
 
 def test_simple_updateitems(simple_json):
     node = simple_json
-    node.data_from_json('{"item1": 3, "item2": 4}')
+    node.from_json('{"item1": 3, "item2": 4}')
     assert node["item1"].value == 3
     assert node["item2"].value == 4
 
 def test_data_to_json(simple_json):
     node = simple_json
-    jsonstr = node.data_to_json()
+    jsonstr = node.to_json()
     assert json.loads(jsonstr) == json.loads(simple_json_string)
 
 @pytest.fixture
 def nested_json():
     from jsonwatch.jsonnode import JsonNode
     node = JsonNode('root')
-    node.data_from_json(nested_json_string)
+    node.from_json(nested_json_string)
     return node
 
 def test_nested_len(nested_json):
@@ -87,7 +87,7 @@ def test_nested_update(nested_json):
             "item2": 5
         }
     }'''
-    node.data_from_json(new_json)
+    node.from_json(new_json)
     assert node["item1"].value == 2
     assert node["item2"].value == 3
     assert node["item3"]["item1"].value == 4
@@ -101,7 +101,7 @@ def test_keys(nested_json):
         "last": 20
     }
     '''
-    node.data_from_json(new_json)
+    node.from_json(new_json)
     assert node.keys[0] == "first"
     assert node.keys[1] == "item1"
     assert node.keys[2] == "item2"
@@ -134,7 +134,7 @@ def test_repr(nested_json):
 def test_corruptjson():
     node = JsonNode('root')
     with pytest.raises(ValueError) as e:
-        node.data_from_json('''
+        node.from_json('''
         {
             "item1": True,
             "item2": False
@@ -152,7 +152,7 @@ def test_latest(nested_json):
                       '            "item1": 1\n'
                       '        }\n'
                       '    }')
-    node.data_from_json(new_json_string)
+    node.from_json(new_json_string)
     assert node["item1"].latest
     assert not node["item2"].latest
     assert node["item3"].latest
