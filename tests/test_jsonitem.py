@@ -4,8 +4,8 @@
 """
 
 import pytest
-from jsonwatch.jsonitem import JsonItem
-from jsonwatch.jsonnode import JsonNode
+from jsonwatch.jsonvalue import JsonValue
+from jsonwatch.jsonobject import JsonObject
 
 
 nested_json_string = ('\n'
@@ -21,8 +21,8 @@ nested_json_string = ('\n'
 
 @pytest.fixture
 def nested_json():
-    from jsonwatch.jsonnode import JsonNode
-    node = JsonNode('root')
+    from jsonwatch.jsonobject import JsonObject
+    node = JsonObject('root')
     node.from_json(nested_json_string)
     return node
 
@@ -34,7 +34,7 @@ def test_item_eq(nested_json):
     assert item1 == node['item1']
 
     # same key, no parent
-    item1 = JsonItem('item1', 1)
+    item1 = JsonValue('item1', 1)
     assert not item1 == node['item1']
 
     # same key, different parent

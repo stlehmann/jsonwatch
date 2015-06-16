@@ -5,7 +5,7 @@
 from jsonwatch.abstractjsonitem import AbstractJsonItem
 
 
-class JsonItem(AbstractJsonItem):
+class JsonValue(AbstractJsonItem):
     def __init__(self, key, value=None):
         super().__init__(key)
         self.__value = None

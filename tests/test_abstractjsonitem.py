@@ -17,8 +17,8 @@ nested_json_string = ('\n'
 
 @pytest.fixture
 def nested_json():
-    from jsonwatch.jsonnode import JsonNode
-    node = JsonNode('root')
+    from jsonwatch.jsonobject import JsonObject
+    node = JsonObject('root')
     node.from_json(nested_json_string)
     return node
 

@@ -4,8 +4,8 @@
 """
 import pytest
 import json
-from jsonwatch.jsonitem import JsonItem
-from jsonwatch.jsonnode import JsonNode
+from jsonwatch.jsonvalue import JsonValue
+from jsonwatch.jsonobject import JsonObject
 
 
 simple_json_string = '{"item1": 1, "item2": 2}'
@@ -22,8 +22,8 @@ nested_json_string = ('\n'
 
 @pytest.fixture
 def simple_json():
-    from jsonwatch.jsonnode import JsonNode
-    node = JsonNode('root')
+    from jsonwatch.jsonobject import JsonObject
+    node = JsonObject('root')
     node.from_json(simple_json_string)
     return node
 
@@ -34,7 +34,7 @@ def test_simple_len(simple_json):
 def test_simple_types(simple_json):
     node = simple_json
     for child in node:
-        assert isinstance(child, JsonItem)
+        assert isinstance(child, JsonValue)
 
 def test_simple_values(simple_json):
     node = simple_json
@@ -54,8 +54,8 @@ def test_data_to_json(simple_json):
 
 @pytest.fixture
 def nested_json():
-    from jsonwatch.jsonnode import JsonNode
-    node = JsonNode('root')
+    from jsonwatch.jsonobject import JsonObject
+    node = JsonObject('root')
     node.from_json(nested_json_string)
     return node
 
@@ -67,7 +67,7 @@ def test_nested_len(nested_json):
 def test_nested_type(nested_json):
     node = nested_json
     nesteditem = node['item3']
-    assert isinstance(nesteditem, JsonNode)
+    assert isinstance(nesteditem, JsonObject)
 
 def test_nested_children(nested_json):
     node = nested_json
@@ -124,7 +124,7 @@ def test_index(nested_json):
     assert node.index(item2) == 1
 
     # Test for ValueError if not in list
-    noitem = JsonItem("noitem", 0)
+    noitem = JsonValue("noitem", 0)
     with pytest.raises(ValueError) as e:
         node.index(noitem) == None
     assert "is not in list" in str(e.value)
@@ -134,7 +134,7 @@ def test_repr(nested_json):
     assert repr(node) == "<JsonNode object key:'root', children:3>"
 
 def test_corruptjson():
-    node = JsonNode('root')
+    node = JsonObject('root')
     with pytest.raises(ValueError) as e:
         node.from_json('''
         {

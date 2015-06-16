@@ -6,7 +6,7 @@
 """
 import json
 from jsonwatch.abstractjsonitem import AbstractJsonItem
-from jsonwatch.jsonitem import JsonItem
+from jsonwatch.jsonvalue import JsonValue
 import bisect
 
 
@@ -14,7 +14,7 @@ key = lambda x: x[0]
 itm = lambda x: x[1]
 
 
-class JsonNode(AbstractJsonItem):
+class JsonObject(AbstractJsonItem):
     """
     This is a json object containing other objects or properties. It is
     identified by a key.
@@ -56,7 +56,7 @@ class JsonNode(AbstractJsonItem):
         def iter_reset_latest(parent):
             for key, child in parent.__children:
                 child.latest = False
-                if isinstance(child, JsonNode): iter_reset_latest(child)
+                if isinstance(child, JsonObject): iter_reset_latest(child)
 
         # reset the *latest* flag of all children
         iter_reset_latest(self)
@@ -66,10 +66,10 @@ class JsonNode(AbstractJsonItem):
             if child is None:
                 # node or item?
                 if isinstance(value, dict):
-                    child = JsonNode(key)
+                    child = JsonObject(key)
                     child.__from_dict(value)
                 else:
-                    child = JsonItem(key, value)
+                    child = JsonValue(key, value)
 
                 # add new child
                 self.add_child(child)
@@ -78,9 +78,9 @@ class JsonNode(AbstractJsonItem):
                 if self.child_added_callback is not None:
                     self.child_added_callback(child)
             else:
-                if isinstance(child, JsonNode) and isinstance(value, dict):
+                if isinstance(child, JsonObject) and isinstance(value, dict):
                     child.__from_dict(value)
-                elif isinstance(child, JsonItem):
+                elif isinstance(child, JsonValue):
                     child.value = value
         self.latest = True
 
@@ -88,7 +88,7 @@ class JsonNode(AbstractJsonItem):
         def iter_children(parent):
             jsondict = {}
             for key, child in parent.__children:
-                if isinstance(child, JsonNode):
+                if isinstance(child, JsonObject):
                     jsondict[key] = iter_children(child)
                 else:
                     jsondict[key] = child.value
