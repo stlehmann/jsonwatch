@@ -6,7 +6,7 @@ from jsonwatch.abstractjsonitem import AbstractJsonItem
 
 
 class JsonItem(AbstractJsonItem):
-    def __init__(self, key, value):
+    def __init__(self, key, value=None):
         super().__init__(key)
         self.__value = None
         self.value = value
@@ -15,9 +15,6 @@ class JsonItem(AbstractJsonItem):
     def __repr__(self):
         return "<JsonItem object key:'%s', value: '%s'>" % \
                (self.key, self.value)
-
-    def __eq__(self, other):
-        return self.parent == other.parent and self.key == other.key
 
     def __len__(self):
         return 0

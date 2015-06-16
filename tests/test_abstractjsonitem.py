@@ -25,7 +25,7 @@ def nested_json():
 
 def test_path(nested_json):
     root = nested_json
-    assert root['item3']['item2'].path == ['root', 'item3', 'item2']
-    assert root.path == ['root']
-    assert root['item2'].path == ['root', 'item2']
+    assert root['item3']['item2'].path == 'root/item3/item2'
+    assert root.path == 'root'
+    assert root['item2'].path == 'root/item2'
 

@@ -74,7 +74,9 @@ def test_nested_children(nested_json):
     nesteditem = node['item3']
     assert nesteditem['item1'].value == 1
     assert nesteditem['item2'].value == 2
-    assert nesteditem['foo'] == None
+    with pytest.raises(KeyError) as e:
+        nesteditem['foo'] == None
+    assert "'foo'" == str(e.value)
 
 def test_nested_update(nested_json):
     node = nested_json
@@ -158,3 +160,15 @@ def test_latest(nested_json):
     assert node["item3"].latest
     assert node["item3"]["item1"].latest
     assert not node["item3"]["item2"].latest
+
+def test_child_from_path(nested_json):
+    node = nested_json
+    item = node['item3']['item2']
+    path = item.path
+
+    # get item
+    assert node.child_from_path(path) == item
+
+    # wrong path returns None
+    assert node.child_from_path(path[1:]) == None # wrong root key
+    assert node.child_from_path('root/item3/wrong') == None # wrong item key

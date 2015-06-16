@@ -16,6 +16,9 @@ class AbstractJsonItem:
         self.parent = None
         self.key = key
 
+    def __eq__(self, other):
+        return type(self) == type(other) and self.path == other.path
+
     @property
     def path(self):
         """
@@ -31,5 +34,5 @@ class AbstractJsonItem:
             path.append(item.key)
             return path
 
-        return iter_keys(self)
+        return '/'.join(iter_keys(self))
 

@@ -1,5 +1,7 @@
 """
-    Copyright © 2015 by Stefan Lehmann
+    JsonNode.py, Copyright © 2015 by Stefan Lehmann
+
+    Contains the JsonNode class.
 
 """
 import json
@@ -13,7 +15,19 @@ itm = lambda x: x[1]
 
 
 class JsonNode(AbstractJsonItem):
+    """
+    This is a json object containing other objects or properties. It is
+    identified by a key.
+
+    """
     def __init__(self, key: str, jsonstr: str=None):
+        """
+
+        :param str key: name of the object
+        :param str jsonstr: json string for the objects and properties of
+                            this object
+
+        """
         super().__init__(key)
         self.child_added_callback = None
         self.latest = True
@@ -26,7 +40,10 @@ class JsonNode(AbstractJsonItem):
         return len(self.__children)
 
     def __getitem__(self, key):
-        return self.child_with_key(key)
+        child = self.child_with_key(key)
+        if child is None:
+            raise KeyError(key)
+        return child
 
     def __iter__(self):
         return (itm(child) for child in self.__children)
@@ -79,6 +96,12 @@ class JsonNode(AbstractJsonItem):
         return iter_children(self)
 
     def add_child(self, child):
+        """
+        Add a child node or item.
+
+        :param AbstractJsonItem child:
+
+        """
         child.parent = self
         bisect.insort(self.__children, (child.key, child))
 
@@ -107,6 +130,15 @@ class JsonNode(AbstractJsonItem):
             return next((v for k, v in self.__children if k == key))
         except StopIteration:
             return None
+
+    def child_from_path(self, path: str):
+        keys = path.split('/')
+        if not keys[0] == self.key:
+            return None
+        node = self
+        for key in  keys[1:]:
+            node = node.child_with_key(key)
+        return node
 
     def index(self, item):
         res = (i for (i, child) in enumerate(self.__children)
