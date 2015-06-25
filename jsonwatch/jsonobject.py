@@ -69,7 +69,8 @@ class JsonObject(AbstractJsonItem):
                     child = JsonObject(key)
                     child.__from_dict(value)
                 else:
-                    child = JsonValue(key, value)
+                    child = JsonValue(key)
+                    child._raw_value = value
 
                 # add new child
                 self.add_child(child)
@@ -81,7 +82,9 @@ class JsonObject(AbstractJsonItem):
                 if isinstance(child, JsonObject) and isinstance(value, dict):
                     child.__from_dict(value)
                 elif isinstance(child, JsonValue):
-                    child.value = value
+                    child._raw_value = value
+                    child.latest = True
+
         self.latest = True
 
     def __to_dict(self):
