@@ -6,7 +6,7 @@
 """
 import json
 from jsonwatch.abstractjsonitem import AbstractJsonItem
-from jsonwatch.jsonvalue import JsonValue
+from jsonwatch.jsonitem import JsonItem
 import bisect
 
 
@@ -14,7 +14,7 @@ key = lambda x: x[0]
 itm = lambda x: x[1]
 
 
-class JsonObject(AbstractJsonItem):
+class JsonNode(AbstractJsonItem):
     """
     This is a json object containing other objects or properties. It is
     identified by a key.
@@ -34,7 +34,7 @@ class JsonObject(AbstractJsonItem):
         self.__children = []
 
         if jsonstr is not None:
-            self.from_json(jsonstr)
+            self.values_from_json(jsonstr)
 
     def __len__(self):
         return len(self.__children)
@@ -56,7 +56,7 @@ class JsonObject(AbstractJsonItem):
         def iter_reset_latest(parent):
             for key, child in parent.__children:
                 child.latest = False
-                if isinstance(child, JsonObject): iter_reset_latest(child)
+                if isinstance(child, JsonNode): iter_reset_latest(child)
 
         # reset the *latest* flag of all children
         iter_reset_latest(self)
@@ -66,10 +66,10 @@ class JsonObject(AbstractJsonItem):
             if child is None:
                 # node or item?
                 if isinstance(value, dict):
-                    child = JsonObject(key)
+                    child = JsonNode(key)
                     child.__from_dict(value)
                 else:
-                    child = JsonValue(key)
+                    child = JsonItem(key)
                     child._raw_value = value
 
                 # add new child
@@ -79,9 +79,9 @@ class JsonObject(AbstractJsonItem):
                 if self.child_added_callback is not None:
                     self.child_added_callback(child)
             else:
-                if isinstance(child, JsonObject) and isinstance(value, dict):
+                if isinstance(child, JsonNode) and isinstance(value, dict):
                     child.__from_dict(value)
-                elif isinstance(child, JsonValue):
+                elif isinstance(child, JsonItem):
                     child._raw_value = value
                     child.latest = True
 
@@ -91,7 +91,7 @@ class JsonObject(AbstractJsonItem):
         def iter_children(parent):
             jsondict = {}
             for key, child in parent.__children:
-                if isinstance(child, JsonObject):
+                if isinstance(child, JsonNode):
                     jsondict[key] = iter_children(child)
                 else:
                     jsondict[key] = child.value
@@ -108,7 +108,7 @@ class JsonObject(AbstractJsonItem):
         child.parent = self
         bisect.insort(self.__children, (child.key, child))
 
-    def from_json(self, jsonstr):
+    def values_from_json(self, jsonstr):
         try:
             jsondata = json.loads(jsonstr)
         except ValueError as e:
@@ -116,7 +116,7 @@ class JsonObject(AbstractJsonItem):
         else:
             self.__from_dict(jsondata)
 
-    def to_json(self):
+    def values_to_json(self):
         jsondict = self.__to_dict()
         jsonstr = json.dumps(jsondict)
         return jsonstr
@@ -152,4 +152,31 @@ class JsonObject(AbstractJsonItem):
             raise ValueError("%s is not in list" % repr(item))
 
     def update(self, other):
-        self.from_json(other.to_json())
+        self.values_from_json(other.values_to_json())
+
+    def remove_child(self, key):
+        for k, child in self.__children:
+            if k == key: self.__children.remove((k, child))
+
+    def dump(self):
+        d = dict((key, child.dump())
+                    for key, child in self.__children)
+        d['__node__'] = True
+        return d
+
+    def _load_config_from_dict(self, jsondict):
+        jsondict.pop('__node__')
+        for key, item in jsondict.items():
+            if item.get('__node__') == True:
+                child = JsonNode(key)
+            else:
+                child = JsonItem(key)
+            child._load_config_from_dict(item)
+            if self.child_with_key(key) is not None:
+                self.remove_child(key)
+
+            self.add_child(child)
+
+    def load(self, string):
+        jsondict = json.loads(string)
+        self._load_config_from_dict(jsondict)

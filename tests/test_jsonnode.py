@@ -4,8 +4,8 @@
 """
 import pytest
 import json
-from jsonwatch.jsonvalue import JsonValue
-from jsonwatch.jsonobject import JsonObject
+from jsonwatch.jsonitem import JsonItem
+from jsonwatch.jsonnode import JsonNode
 
 
 simple_json_string = '{"item1": 1, "item2": 2}'
@@ -22,9 +22,9 @@ nested_json_string = ('\n'
 
 @pytest.fixture
 def simple_json():
-    from jsonwatch.jsonobject import JsonObject
-    node = JsonObject('root')
-    node.from_json(simple_json_string)
+    from jsonwatch.jsonnode import JsonNode
+    node = JsonNode('root')
+    node.values_from_json(simple_json_string)
     return node
 
 def test_simple_len(simple_json):
@@ -34,7 +34,7 @@ def test_simple_len(simple_json):
 def test_simple_types(simple_json):
     node = simple_json
     for child in node:
-        assert isinstance(child, JsonValue)
+        assert isinstance(child, JsonItem)
 
 def test_simple_values(simple_json):
     node = simple_json
@@ -43,20 +43,20 @@ def test_simple_values(simple_json):
 
 def test_simple_updateitems(simple_json):
     node = simple_json
-    node.from_json('{"item1": 3, "item2": 4}')
+    node.values_from_json('{"item1": 3, "item2": 4}')
     assert node["item1"].value == 3
     assert node["item2"].value == 4
 
 def test_data_to_json(simple_json):
     node = simple_json
-    jsonstr = node.to_json()
+    jsonstr = node.values_to_json()
     assert json.loads(jsonstr) == json.loads(simple_json_string)
 
 @pytest.fixture
 def nested_json():
-    from jsonwatch.jsonobject import JsonObject
-    node = JsonObject('root')
-    node.from_json(nested_json_string)
+    from jsonwatch.jsonnode import JsonNode
+    node = JsonNode('root')
+    node.values_from_json(nested_json_string)
     return node
 
 def test_nested_len(nested_json):
@@ -67,7 +67,7 @@ def test_nested_len(nested_json):
 def test_nested_type(nested_json):
     node = nested_json
     nesteditem = node['item3']
-    assert isinstance(nesteditem, JsonObject)
+    assert isinstance(nesteditem, JsonNode)
 
 def test_nested_children(nested_json):
     node = nested_json
@@ -89,7 +89,7 @@ def test_nested_update(nested_json):
             "item2": 5
         }
     }'''
-    node.from_json(new_json)
+    node.values_from_json(new_json)
     assert node["item1"].value == 2
     assert node["item2"].value == 3
     assert node["item3"]["item1"].value == 4
@@ -103,7 +103,7 @@ def test_keys(nested_json):
         "last": 20
     }
     '''
-    node.from_json(new_json)
+    node.values_from_json(new_json)
     assert node.keys[0] == "first"
     assert node.keys[1] == "item1"
     assert node.keys[2] == "item2"
@@ -124,7 +124,7 @@ def test_index(nested_json):
     assert node.index(item2) == 1
 
     # Test for ValueError if not in list
-    noitem = JsonValue("noitem", 0)
+    noitem = JsonItem("noitem")
     with pytest.raises(ValueError) as e:
         node.index(noitem) == None
     assert "is not in list" in str(e.value)
@@ -134,9 +134,9 @@ def test_repr(nested_json):
     assert repr(node) == "<JsonNode object key:'root', children:3>"
 
 def test_corruptjson():
-    node = JsonObject('root')
+    node = JsonNode('root')
     with pytest.raises(ValueError) as e:
-        node.from_json('''
+        node.values_from_json('''
         {
             "item1": True,
             "item2": False
@@ -154,7 +154,7 @@ def test_latest(nested_json):
                       '            "item1": 1\n'
                       '        }\n'
                       '    }')
-    node.from_json(new_json_string)
+    node.values_from_json(new_json_string)
     assert node["item1"].latest
     assert not node["item2"].latest
     assert node["item3"].latest

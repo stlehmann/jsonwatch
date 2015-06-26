@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
+
+
 import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -14,6 +17,7 @@ class PyTest(TestCommand):
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
+
 setup(
     name='jsonwatch',
     version='0.0.1',
@@ -25,5 +29,6 @@ setup(
     description='keep track of json data',
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
+    install_requires=['jsonpickle>=0.9.0'],
     platforms='any'
 )

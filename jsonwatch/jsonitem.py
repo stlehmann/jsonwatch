@@ -5,7 +5,7 @@
 from jsonwatch.abstractjsonitem import AbstractJsonItem
 
 
-class JsonValue(AbstractJsonItem):
+class JsonItem(AbstractJsonItem):
     def __init__(self, key, **kwargs):
         super().__init__(key)
         self._raw_value = None
@@ -63,3 +63,19 @@ class JsonValue(AbstractJsonItem):
         if self.value is None:
             return ""
         return "%.*f" % (self.decimals, self.value)
+
+    def dump(self):
+        attributes = ['name', 'readonly', 'unit', 'decimals', 'min', 'max',
+                      'numerator', 'denominator']
+
+        return dict((attr, getattr(self, attr)) for attr in attributes
+                 if getattr(self, attr) is not None)
+
+    def _load_config_from_dict(self, dictionary):
+        try:
+            dictionary.pop('__node__')
+        except KeyError:
+            pass
+
+        for key, value in dictionary.items():
+            setattr(self, key, value)
