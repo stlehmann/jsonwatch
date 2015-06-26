@@ -1,6 +1,5 @@
 """
-    JsonNode.py, Copyright © 2015 by Stefan Lehmann
-
+    JsonNode.py, Copyright (c) 2015 by Stefan Lehmann
     Contains the JsonNode class.
 
 """
@@ -20,7 +19,7 @@ class JsonNode(AbstractJsonItem):
     identified by a key.
 
     """
-    def __init__(self, key: str, jsonstr: str=None):
+    def __init__(self, key: str):
         """
 
         :param str key: name of the object
@@ -33,14 +32,11 @@ class JsonNode(AbstractJsonItem):
         self.latest = True
         self.__children = []
 
-        if jsonstr is not None:
-            self.values_from_json(jsonstr)
-
     def __len__(self):
         return len(self.__children)
 
     def __getitem__(self, key):
-        child = self.child_with_key(key)
+        child = self.item_with_key(key)
         if child is None:
             raise KeyError(key)
         return child
@@ -62,7 +58,7 @@ class JsonNode(AbstractJsonItem):
         iter_reset_latest(self)
 
         for key, value in jsondict.items():
-            child = self.child_with_key(key)
+            child = self.item_with_key(key)
             if child is None:
                 # node or item?
                 if isinstance(value, dict):
@@ -125,22 +121,22 @@ class JsonNode(AbstractJsonItem):
     def keys(self):
         return list(map(key, self.__children))
 
-    def child_at(self, index):
+    def item_at(self, index):
         return itm(self.__children[index])
 
-    def child_with_key(self, key):
+    def item_with_key(self, key):
         try:
             return next((v for k, v in self.__children if k == key))
         except StopIteration:
             return None
 
-    def child_from_path(self, path: str):
+    def item_from_path(self, path: str):
         keys = path.split('/')
         if not keys[0] == self.key:
             return None
         node = self
         for key in  keys[1:]:
-            node = node.child_with_key(key)
+            node = node.item_with_key(key)
         return node
 
     def index(self, item):
@@ -151,16 +147,19 @@ class JsonNode(AbstractJsonItem):
         except StopIteration:
             raise ValueError("%s is not in list" % repr(item))
 
-    def update(self, other):
-        self.values_from_json(other.values_to_json())
+    def remove(self, key):
+        try:
+            k, item = next(((k, item) for k, item
+                            in self.__children if k == key))
+        except StopIteration as e:
+            raise ValueError("JsonNode.remove(x): '%s' not in list"
+                             % key)
 
-    def remove_child(self, key):
-        for k, child in self.__children:
-            if k == key: self.__children.remove((k, child))
+        self.__children.remove((k, item))
 
-    def dump(self):
-        d = dict((key, child.dump())
-                    for key, child in self.__children)
+    def _dump_config_to_dict(self):
+        d = dict((key, item._dump_config_to_dict())
+                 for key, item in self.__children)
         d['__node__'] = True
         return d
 
@@ -172,10 +171,13 @@ class JsonNode(AbstractJsonItem):
             else:
                 child = JsonItem(key)
             child._load_config_from_dict(item)
-            if self.child_with_key(key) is not None:
-                self.remove_child(key)
+            if self.item_with_key(key) is not None:
+                self.remove(key)
 
             self.add_child(child)
+
+    def dump(self)->str:
+        return json.dumps(self._dump_config_to_dict())
 
     def load(self, string):
         jsondict = json.loads(string)

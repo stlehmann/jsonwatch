@@ -1,7 +1,10 @@
 """
-    Copyright © 2015 by Stefan Lehmann
+    Copyright (c) 2015 by Stefan Lehmann
+    Contains the JsonItem class.
 
 """
+
+import json
 from jsonwatch.abstractjsonitem import AbstractJsonItem
 
 
@@ -26,6 +29,22 @@ class JsonItem(AbstractJsonItem):
     def __len__(self):
         return 0
 
+    def _load_config_from_dict(self, dictionary):
+        try:
+            dictionary.pop('__node__')
+        except KeyError:
+            pass
+
+        for key, value in dictionary.items():
+            setattr(self, key, value)
+
+    def _dump_config_to_dict(self):
+        attributes = ['name', 'readonly', 'unit', 'decimals', 'min', 'max',
+                      'numerator', 'denominator']
+
+        return dict((attr, getattr(self, attr)) for attr in attributes
+                 if getattr(self, attr) is not None)
+
     @property
     def value(self):
         if self._raw_value is None:
@@ -36,7 +55,7 @@ class JsonItem(AbstractJsonItem):
     @value.setter
     def value(self, val):
         if self.readonly:
-            raise AttributeError("JsonValue object is readonly")
+            raise AttributeError("JsonItem object is readonly")
 
         if val is None:
             self._raw_value = None
@@ -65,17 +84,8 @@ class JsonItem(AbstractJsonItem):
         return "%.*f" % (self.decimals, self.value)
 
     def dump(self):
-        attributes = ['name', 'readonly', 'unit', 'decimals', 'min', 'max',
-                      'numerator', 'denominator']
+        json.dumps(self._dump_config_to_dict())
 
-        return dict((attr, getattr(self, attr)) for attr in attributes
-                 if getattr(self, attr) is not None)
-
-    def _load_config_from_dict(self, dictionary):
-        try:
-            dictionary.pop('__node__')
-        except KeyError:
-            pass
-
-        for key, value in dictionary.items():
-            setattr(self, key, value)
+    def load(self, string):
+        d = json.loads(string)
+        self._load_config_from_dict(d)

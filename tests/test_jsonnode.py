@@ -1,5 +1,5 @@
 """
-    Copyright © 2015 by Stefan Lehmann
+    Copyright (c) 2015 by Stefan Lehmann
 
 """
 import pytest
@@ -9,15 +9,14 @@ from jsonwatch.jsonnode import JsonNode
 
 
 simple_json_string = '{"item1": 1, "item2": 2}'
-nested_json_string = ('\n'
-                      '    {\n'
+nested_json_string = ('{\n'
+                      '    "item1": 1,\n'
+                      '    "item2": 2,\n'
+                      '    "item3": {\n'
                       '        "item1": 1,\n'
-                      '        "item2": 2,\n'
-                      '        "item3": {\n'
-                      '            "item1": 1,\n'
-                      '            "item2": 2\n'
-                      '        }\n'
-                      '    }')
+                      '        "item2": 2\n'
+                      '    }\n'
+                      '}')
 
 
 @pytest.fixture
@@ -112,9 +111,9 @@ def test_keys(nested_json):
 
 def test_item_at(nested_json):
     node = nested_json
-    assert node.child_at(0).key == "item1"
-    assert node.child_at(1).key == "item2"
-    assert node.child_at(2).key == "item3"
+    assert node.item_at(0).key == "item1"
+    assert node.item_at(1).key == "item2"
+    assert node.item_at(2).key == "item3"
 
 def test_index(nested_json):
     node = nested_json
@@ -161,14 +160,57 @@ def test_latest(nested_json):
     assert node["item3"]["item1"].latest
     assert not node["item3"]["item2"].latest
 
-def test_child_from_path(nested_json):
+def test_item_from_path(nested_json):
     node = nested_json
     item = node['item3']['item2']
     path = item.path
 
     # get item
-    assert node.child_from_path(path) == item
+    assert node.item_from_path(path) == item
 
-    # wrong path returns None
-    assert node.child_from_path(path[1:]) == None # wrong root key
-    assert node.child_from_path('root/item3/wrong') == None # wrong item key
+def test_remove(nested_json):
+    root = nested_json
+
+    # remove one existing item
+    root.remove('item1')
+    assert len(root) == 2
+
+    # remove item again -> ValueError
+    with pytest.raises(ValueError) as e:
+        root.remove('item1')
+    assert "'item1' not in list" in str(e)
+
+def test_dump():
+    root = JsonNode('root')
+    root.add_child(JsonItem('a', name='item1'))
+    root.add_child(JsonNode('b'))
+
+    jsondict = json.loads(root.dump())
+    assert jsondict['a'].get('__node__') is None
+    assert jsondict['a']['name'] == 'item1'
+    assert jsondict['b']['__node__'] == True
+
+def test_load():
+    root = JsonNode('root')
+    jsonstr = '''{
+                    "a": {
+                        "denominator": 1,
+                        "name": "item1",
+                        "decimals": 3,
+                        "readonly": true,
+                        "unit": "",
+                        "numerator": 1
+                     },
+                     "__node__": true,
+                     "b": {
+                        "__node__": true
+                    }
+                }'''
+    root.load(jsonstr)
+
+    # jsonitem
+    assert isinstance(root['a'], JsonItem)
+    assert root['a'].name == "item1"
+
+    # jsonnode
+    assert isinstance(root['b'], JsonNode)
