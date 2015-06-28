@@ -1,0 +1,38 @@
+{
+  "__node__": true,
+  "processdata": {
+    "__node__": true,
+    "in": {
+      "decimals": 1,
+      "key": "in",
+      "name": "Actual Temperature",
+      "numerator": 10,
+      "denominator": 1,
+      "unit": "°C",
+      "readonly": false
+    },
+    "kp": {
+      "name": "proportional gain",
+      "numerator": 10,
+      "readonly": false,
+      "decimals": 1
+    },
+    "ki": {
+      "name": "integral gain",
+      "numerator": 10,
+      "readonly": false,
+      "decimals": 1
+    },
+    "y": {
+      "name": "controlvalue",
+      "numerator": 10,
+      "unit": "%",
+      "decimal": 1
+    },
+    "kd": {
+      "name": "differential gain",
+      "numerator": 10,
+      "decimal": 1
+    }
+  }
+}

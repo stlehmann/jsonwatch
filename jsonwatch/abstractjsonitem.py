@@ -15,6 +15,7 @@ class AbstractJsonItem:
     def __init__(self, key):
         self.parent = None
         self.key = key
+        self.name = ""
 
     def __eq__(self, other):
         return type(self) == type(other) and self.path == other.path
