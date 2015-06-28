@@ -69,7 +69,7 @@ class JsonNode(AbstractJsonItem):
                     child._raw_value = value
 
                 # add new child
-                self.add_child(child)
+                self.add(child)
 
                 # run callback function
                 if self.child_added_callback is not None:
@@ -94,7 +94,7 @@ class JsonNode(AbstractJsonItem):
             return jsondict
         return iter_children(self)
 
-    def add_child(self, child):
+    def add(self, child):
         """
         Add a child node or item.
 
@@ -120,6 +120,10 @@ class JsonNode(AbstractJsonItem):
     @property
     def keys(self):
         return list(map(key, self.__children))
+
+    @property
+    def items(self):
+        return (item for key, item in self.__children)
 
     def item_at(self, index):
         return itm(self.__children[index])
@@ -174,7 +178,7 @@ class JsonNode(AbstractJsonItem):
             if self.item_with_key(key) is not None:
                 self.remove(key)
 
-            self.add_child(child)
+            self.add(child)
 
     def dump(self)->str:
         return json.dumps(self._dump_config_to_dict())

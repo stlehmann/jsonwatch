@@ -182,8 +182,8 @@ def test_remove(nested_json):
 
 def test_dump():
     root = JsonNode('root')
-    root.add_child(JsonItem('a', name='item1'))
-    root.add_child(JsonNode('b'))
+    root.add(JsonItem('a', name='item1'))
+    root.add(JsonNode('b'))
 
     jsondict = json.loads(root.dump())
     assert jsondict['a'].get('__node__') is None
