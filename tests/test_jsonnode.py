@@ -168,6 +168,22 @@ def test_item_from_path(nested_json):
     # get item
     assert node.item_from_path(path) == item
 
+def test_items(nested_json):
+    node = nested_json
+    iterator = node.items
+    key, item = next(iterator)
+    assert key == "item1"
+    assert item == node["item1"]
+    key, item = next(iterator)
+    assert key == "item2"
+    assert item == node["item2"]
+    key, item = next(iterator)
+    assert key == "item3"
+    assert item == node["item3"]
+    with pytest.raises(StopIteration):
+        next(iterator)
+
+
 def test_remove(nested_json):
     root = nested_json
 

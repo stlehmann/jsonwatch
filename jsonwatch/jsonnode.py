@@ -123,7 +123,7 @@ class JsonNode(AbstractJsonItem):
 
     @property
     def items(self):
-        return (item for key, item in self.__children)
+        return ((key, item) for key, item in self.__children)
 
     def item_at(self, index):
         return itm(self.__children[index])
