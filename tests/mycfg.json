@@ -15,7 +15,25 @@
       "name": "controlvalue",
       "numerator": 10,
       "unit": "%",
-      "decimal": 1
+      "decimals": 1
+    },
+    "yp": {
+      "name": "controlvalue p",
+      "numerator": 10,
+      "unit": "%",
+      "decimals": 1
+    },
+    "yi": {
+      "name": "controlvalue i",
+      "numerator": 10,
+      "unit": "%",
+      "decimals": 1
+    },
+    "yd": {
+      "name": "controlvalue d",
+      "numerator": 10,
+      "unit": "%",
+      "decimals": 1
     }
   },
   "settings": {
@@ -35,7 +53,12 @@
     "kd": {
       "name": "differential gain",
       "numerator": 10,
-      "decimal": 1
+      "readonly": false,
+      "decimals": 1
+    },
+    "aw": {
+      "name": "antiwindup",
+      "readonly": false
     }
   }
 }
