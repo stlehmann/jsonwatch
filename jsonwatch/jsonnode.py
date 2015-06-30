@@ -69,6 +69,7 @@ class JsonNode(AbstractJsonItem):
                 else:
                     child = JsonItem(key)
                     child._raw_value = value
+                    child.type = child.type or type(value)
 
                 # add new child
                 self.add(child)
@@ -81,6 +82,7 @@ class JsonNode(AbstractJsonItem):
                     child.__from_dict(value)
                 elif isinstance(child, JsonItem):
                     child._raw_value = value
+                    child.type = child.type or type(value)
                     child.latest = True
 
         self.latest = True

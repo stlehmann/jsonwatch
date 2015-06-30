@@ -20,6 +20,7 @@ class JsonItem(AbstractJsonItem):
         self.min = kwargs.get('min', None)
         self.max = kwargs.get('max', None)
         self.numerator = kwargs.get('numerator', 1)
+        self.type = None
         self._denominator = kwargs.get('denominator', 1)
         self.latest = True
 
@@ -41,7 +42,7 @@ class JsonItem(AbstractJsonItem):
 
     def _dump_config_to_dict(self):
         attributes = ['name', 'readonly', 'unit', 'decimals', 'min', 'max',
-                      'numerator', 'denominator']
+                      'numerator', 'denominator', 'type']
 
         return dict((attr, getattr(self, attr)) for attr in attributes
                  if getattr(self, attr) is not None)
@@ -51,7 +52,10 @@ class JsonItem(AbstractJsonItem):
         if self._raw_value is None:
             return None
 
-        return self._raw_value * self.denominator / self.numerator
+        if self.type in (int, float, None):
+            return self._raw_value * self.denominator / self.numerator
+        elif self.type == bool:
+            return self._raw_value
 
     @value.setter
     def value(self, val):
@@ -68,7 +72,11 @@ class JsonItem(AbstractJsonItem):
         if self.min is not None and val < self.min:
             raise ValueError("value is smaller than minimum")
 
-        self._raw_value = int(val * self.numerator / self.denominator)
+        x = val * self.numerator / self.denominator
+        if self.type is not None:
+            self._raw_value = self.type(x)
+        else:
+            self._raw_value = x
 
     @property
     def denominator(self):
@@ -82,7 +90,11 @@ class JsonItem(AbstractJsonItem):
     def value_str(self):
         if self.value is None:
             return ""
-        return "%.*f" % (self.decimals, self.value)
+
+        if self.type == float:
+            return "%.*f" % (self.decimals, self.value)
+        else:
+            return str(self.value)
 
     def dump(self):
         json.dumps(self._dump_config_to_dict())
