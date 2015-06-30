@@ -11,6 +11,15 @@
       "unit": "°C",
       "readonly": false
     },
+    "y": {
+      "name": "controlvalue",
+      "numerator": 10,
+      "unit": "%",
+      "decimal": 1
+    }
+  },
+  "settings": {
+    "__node__": true,
     "kp": {
       "name": "proportional gain",
       "numerator": 10,
@@ -22,12 +31,6 @@
       "numerator": 10,
       "readonly": false,
       "decimals": 1
-    },
-    "y": {
-      "name": "controlvalue",
-      "numerator": 10,
-      "unit": "%",
-      "decimal": 1
     },
     "kd": {
       "name": "differential gain",

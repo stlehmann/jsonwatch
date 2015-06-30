@@ -142,7 +142,7 @@ def test_corruptjson():
             "item3": "something"
         }
         ''')
-    assert 'Corrupt Json string' in str(e.value)
+    assert 'corrupt json string' in str(e)
 
 def test_latest(nested_json):
     node = nested_json

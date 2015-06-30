@@ -108,7 +108,7 @@ class JsonNode(AbstractJsonItem):
         try:
             jsondata = json.loads(jsonstr)
         except ValueError as e:
-            raise ValueError("Corrupt Json string")
+            raise ValueError("corrupt json string") from e
         else:
             self.__from_dict(jsondata)
 
@@ -134,12 +134,11 @@ class JsonNode(AbstractJsonItem):
         except StopIteration:
             return None
 
-    def item_from_path(self, path: str):
-        keys = path.split('/')
-        if not keys[0] == self.key:
+    def item_from_path(self, path: list):
+        if not path[0] == self.key:
             return None
         node = self
-        for key in  keys[1:]:
+        for key in  path[1:]:
             node = node.item_with_key(key)
         return node
 
