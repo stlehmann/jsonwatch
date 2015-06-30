@@ -15,6 +15,19 @@ def set_in_dict(data_dict, maplist, value):
     data_dict[maplist[-1]] = value
 
 
+VALUETYPES = [('int', int), ('float', float), ('bool', bool), ('str', str)]
+
+
+def type_from_str(typestring):
+    for s, t in VALUETYPES:
+        if s == typestring:
+            return t
+
+def type_to_str(type_):
+    for s, t in VALUETYPES:
+        if t == type_:
+            return s
+
 class AbstractJsonItem:
     """
     Abstract base clas for JsonNode and JsonItem.

@@ -5,11 +5,11 @@
 """
 
 import json
-from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
-    set_in_dict
-from jsonwatch.jsonitem import JsonItem
 import bisect
 
+from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
+    set_in_dict, type_to_str
+from jsonwatch.jsonitem import JsonItem
 
 key = lambda x: x[0]
 itm = lambda x: x[1]
@@ -69,7 +69,7 @@ class JsonNode(AbstractJsonItem):
                 else:
                     child = JsonItem(key)
                     child._raw_value = value
-                    child.type = child.type or type(value)
+                    child.type = child.type or type_to_str(type(value))
 
                 # add new child
                 self.add(child)
@@ -82,7 +82,7 @@ class JsonNode(AbstractJsonItem):
                     child.__from_dict(value)
                 elif isinstance(child, JsonItem):
                     child._raw_value = value
-                    child.type = child.type or type(value)
+                    child.type = child.type or type_to_str(type(value))
                     child.latest = True
 
         self.latest = True
@@ -192,7 +192,9 @@ class JsonNode(AbstractJsonItem):
             self.add(child)
 
     def dump(self)->str:
-        return json.dumps(self._dump_config_to_dict())
+        dict_ = self._dump_config_to_dict()
+        print(dict_)
+        return json.dumps(dict_)
 
     def load(self, string):
         jsondict = json.loads(string)

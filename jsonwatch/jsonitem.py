@@ -6,7 +6,7 @@
 
 import json
 from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
-    set_in_dict
+    set_in_dict, type_from_str
 
 
 class JsonItem(AbstractJsonItem):
@@ -52,9 +52,9 @@ class JsonItem(AbstractJsonItem):
         if self._raw_value is None:
             return None
 
-        if self.type in (int, float, None):
+        if self.type in ('int', 'float', None):
             return self._raw_value * self.denominator / self.numerator
-        elif self.type == bool:
+        elif self.type == 'bool':
             return self._raw_value
 
     @value.setter
@@ -74,7 +74,7 @@ class JsonItem(AbstractJsonItem):
 
         x = val * self.numerator / self.denominator
         if self.type is not None:
-            self._raw_value = self.type(x)
+            self._raw_value = type_from_str(self.type)(x)
         else:
             self._raw_value = x
 
@@ -91,7 +91,7 @@ class JsonItem(AbstractJsonItem):
         if self.value is None:
             return ""
 
-        if self.type == float:
+        if self.type == 'float':
             return "%.*f" % (self.decimals, self.value)
         else:
             return str(self.value)
