@@ -8,22 +8,23 @@ from jsonwatch.jsonitem import JsonItem
 from jsonwatch.jsonnode import JsonNode
 
 
-nested_json_string = ('\n'
-                      '    {\n'
+nested_json_string = ('{"root":\n'
+                      '  {\n'
+                      '    "item1": 1,\n'
+                      '    "item2": 2,\n'
+                      '    "item3": {\n'
                       '        "item1": 1,\n'
-                      '        "item2": 2,\n'
-                      '        "item3": {\n'
-                      '            "item1": 1,\n'
-                      '            "item2": 2\n'
-                      '        }\n'
-                      '    }')
+                      '        "item2": 2\n'
+                      '    }\n'
+                      '  }\n'
+                      '}')
 
 
 @pytest.fixture
 def nested_json():
     from jsonwatch.jsonnode import JsonNode
     node = JsonNode('root')
-    node.values_from_json(nested_json_string)
+    node.from_json(nested_json_string)
     return node
 
 @pytest.fixture

@@ -3,6 +3,7 @@
     Contains the JsonNode class.
 
 """
+from functools import reduce
 import json
 from jsonwatch.abstractjsonitem import AbstractJsonItem
 from jsonwatch.jsonitem import JsonItem
@@ -84,15 +85,32 @@ class JsonNode(AbstractJsonItem):
         self.latest = True
 
     def __to_dict(self):
-        def iter_children(parent):
+        def get_from_dict(data_dict, maplist):
+            return reduce(lambda d, k: d[k], maplist, data_dict)
+
+        def set_in_dict(data_dict, maplist, value):
+            for k in maplist[:-1]: data_dict = data_dict[k]
+            data_dict[maplist[-1]] = value
+
+        def iter_children(node):
             jsondict = {}
-            for key, child in parent.__children:
+            for key, child in node.__children:
                 if isinstance(child, JsonNode):
                     jsondict[key] = iter_children(child)
                 else:
                     jsondict[key] = child.value
             return jsondict
-        return iter_children(self)
+
+        def iter_parents(parents, dict_={}):
+            if len(parents):
+                return {parents[0]: iter_parents(parents[1:], dict_)}
+            else:
+                return {}
+
+        dict_ = iter_parents(self.path)
+        set_in_dict(dict_, self.path, iter_children(self))
+        print(dict_)
+        return dict_
 
     def add(self, child):
         """
@@ -104,15 +122,20 @@ class JsonNode(AbstractJsonItem):
         child.parent = self
         bisect.insort(self.__children, (child.key, child))
 
-    def values_from_json(self, jsonstr):
+    def from_json(self, jsonstr):
         try:
             jsondata = json.loads(jsonstr)
         except ValueError as e:
             raise ValueError("corrupt json string") from e
-        else:
-            self.__from_dict(jsondata)
 
-    def values_to_json(self):
+        try:
+            jsondata = jsondata[self.key]
+        except KeyError as e:
+            raise KeyError("wrong root key") from e
+
+        self.__from_dict(jsondata)
+
+    def to_json(self):
         jsondict = self.__to_dict()
         jsonstr = json.dumps(jsondict)
         return jsonstr
