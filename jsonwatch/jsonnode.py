@@ -3,9 +3,10 @@
     Contains the JsonNode class.
 
 """
-from functools import reduce
+
 import json
-from jsonwatch.abstractjsonitem import AbstractJsonItem
+from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
+    set_in_dict
 from jsonwatch.jsonitem import JsonItem
 import bisect
 
@@ -85,31 +86,17 @@ class JsonNode(AbstractJsonItem):
         self.latest = True
 
     def __to_dict(self):
-        def get_from_dict(data_dict, maplist):
-            return reduce(lambda d, k: d[k], maplist, data_dict)
-
-        def set_in_dict(data_dict, maplist, value):
-            for k in maplist[:-1]: data_dict = data_dict[k]
-            data_dict[maplist[-1]] = value
-
         def iter_children(node):
             jsondict = {}
             for key, child in node.__children:
                 if isinstance(child, JsonNode):
                     jsondict[key] = iter_children(child)
                 else:
-                    jsondict[key] = child.value
+                    jsondict[key] = child._raw_value
             return jsondict
 
-        def iter_parents(parents, dict_={}):
-            if len(parents):
-                return {parents[0]: iter_parents(parents[1:], dict_)}
-            else:
-                return {}
-
-        dict_ = iter_parents(self.path)
+        dict_ = nested_dict_from_list(self.path)
         set_in_dict(dict_, self.path, iter_children(self))
-        print(dict_)
         return dict_
 
     def add(self, child):

@@ -3,6 +3,17 @@
 
 """
 
+def nested_dict_from_list(parents, dict_={}):
+    if len(parents):
+        return {parents[0]: nested_dict_from_list(parents[1:], dict_)}
+    else:
+        return {}
+
+
+def set_in_dict(data_dict, maplist, value):
+    for k in maplist[:-1]: data_dict = data_dict[k]
+    data_dict[maplist[-1]] = value
+
 
 class AbstractJsonItem:
     """
@@ -35,5 +46,5 @@ class AbstractJsonItem:
             path.append(item.key)
             return path
 
-        return '/'.join(iter_keys(self))
+        return list(iter_keys(self))
 

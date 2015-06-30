@@ -5,7 +5,8 @@
 """
 
 import json
-from jsonwatch.abstractjsonitem import AbstractJsonItem
+from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
+    set_in_dict
 
 
 class JsonItem(AbstractJsonItem):
@@ -67,7 +68,7 @@ class JsonItem(AbstractJsonItem):
         if self.min is not None and val < self.min:
             raise ValueError("value is smaller than minimum")
 
-        self._raw_value = val * self.numerator / self.denominator
+        self._raw_value = int(val * self.numerator / self.denominator)
 
     @property
     def denominator(self):
@@ -89,3 +90,9 @@ class JsonItem(AbstractJsonItem):
     def load(self, string):
         d = json.loads(string)
         self._load_config_from_dict(d)
+
+    def to_json(self):
+        jsondict = nested_dict_from_list(self.path)
+        set_in_dict(jsondict, self.path, self._raw_value)
+        jsonstr = json.dumps(jsondict)
+        return jsonstr
