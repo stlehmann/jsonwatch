@@ -30,7 +30,7 @@ def nested_json():
 @pytest.fixture
 def one_jsonitem():
     return JsonItem('key', name="item1", readonly=False, unit="°C",
-                    decimals=1, min=0, max=100, numerator=100, denominator=10)
+                    decimals=1, min=0, max=100, scalefactor=0.01, type='int')
 
 def test_eq(nested_json):
     node = nested_json
@@ -55,19 +55,18 @@ def test_init_arguments(one_jsonitem):
     assert item.decimals == 1
     assert item.min == 0
     assert item.max == 100
-    assert item.numerator == 100
-    assert item.denominator == 10
+    assert item.scalefactor == 0.01
 
 def test_value_conversion(one_jsonitem):
     item = one_jsonitem
 
     # value to raw value
     item.value = 1.5
-    assert item._raw_value == 15.0
+    assert item._raw_value == 150
 
     # raw value to value
     item._raw_value = 150
-    assert item.value == 15.0
+    assert item.value == 1.5
 
     # minimum
     with pytest.raises(ValueError) as e:
@@ -84,9 +83,3 @@ def test_value_conversion(one_jsonitem):
     with pytest.raises(AttributeError) as e:
         item.value = 20
     assert "JsonItem object is readonly" in str(e)
-
-def test_denominator(one_jsonitem):
-    item = one_jsonitem
-    with pytest.raises(ValueError) as e:
-        item.denominator = 0
-    assert "denominator can not be 0" in str(e)

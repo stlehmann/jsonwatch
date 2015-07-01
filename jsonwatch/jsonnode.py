@@ -192,9 +192,7 @@ class JsonNode(AbstractJsonItem):
             self.add(child)
 
     def dump(self)->str:
-        dict_ = self._dump_config_to_dict()
-        print(dict_)
-        return json.dumps(dict_)
+        return json.dumps(self._dump_config_to_dict())
 
     def load(self, string):
         jsondict = json.loads(string)

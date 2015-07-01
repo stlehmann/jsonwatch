@@ -16,12 +16,11 @@ class JsonItem(AbstractJsonItem):
         self.readonly = kwargs.get('readonly', True)
         self.name = kwargs.get('name', "")
         self.unit = kwargs.get('unit', "")
-        self.decimals = kwargs.get('decimals', 3)
+        self.decimals = kwargs.get('decimals', 0)
         self.min = kwargs.get('min', None)
         self.max = kwargs.get('max', None)
-        self.numerator = kwargs.get('numerator', 1)
-        self.type = None
-        self._denominator = kwargs.get('denominator', 1)
+        self.scalefactor = kwargs.get('scalefactor', 1)
+        self.type = kwargs.get('type', None)
         self.latest = True
 
     def __repr__(self):
@@ -42,7 +41,7 @@ class JsonItem(AbstractJsonItem):
 
     def _dump_config_to_dict(self):
         attributes = ['name', 'readonly', 'unit', 'decimals', 'min', 'max',
-                      'numerator', 'denominator', 'type']
+                      'scalefactor', 'type']
 
         return dict((attr, getattr(self, attr)) for attr in attributes
                  if getattr(self, attr) is not None)
@@ -53,7 +52,7 @@ class JsonItem(AbstractJsonItem):
             return None
 
         if self.type in ('int', 'float', None):
-            return self._raw_value * self.denominator / self.numerator
+            return self._raw_value * self.scalefactor
         elif self.type == 'bool':
             return self._raw_value
 
@@ -72,26 +71,19 @@ class JsonItem(AbstractJsonItem):
         if self.min is not None and val < self.min:
             raise ValueError("value is smaller than minimum")
 
-        x = val * self.numerator / self.denominator
-        if self.type is not None:
-            self._raw_value = type_from_str(self.type)(x)
-        else:
-            self._raw_value = x
-
-    @property
-    def denominator(self):
-        return self._denominator
-
-    @denominator.setter
-    def denominator(self, val):
-        if val == 0: raise ValueError("denominator can not be 0")
-        self._denominator = val
+        # scale to raw value
+        if self.type == 'int':
+            self._raw_value = round(val / self.scalefactor)
+        elif self.type == 'float':
+            self._raw_value = val / self.scalefactor
+        elif self.type in ('bool', 'str'):
+            self._raw_value = val
 
     def value_str(self):
         if self.value is None:
             return ""
 
-        if self.type == 'float':
+        if self.type in ('float', 'int'):
             return "%.*f" % (self.decimals, self.value)
         else:
             return str(self.value)
