@@ -46,6 +46,7 @@ class JsonItem(AbstractJsonItem):
         return dict((attr, getattr(self, attr)) for attr in attributes
                  if getattr(self, attr) is not None)
 
+    # value property
     @property
     def value(self):
         if self._raw_value is None:

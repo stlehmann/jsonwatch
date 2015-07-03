@@ -4,6 +4,7 @@
 """
 
 import pytest
+from jsonwatch.jsonitem import JsonItem
 
 nested_json_string = ('{"root":\n'
                       '  {\n'
@@ -29,3 +30,11 @@ def test_path(nested_json):
     assert root['item3']['item2'].path == ['root', 'item3', 'item2']
     assert root.path == ['root']
     assert root['item2'].path == ['root', 'item2']
+
+def test_key(nested_json):
+    root = nested_json
+    item = root["item2"]
+    item.key = "item4"
+    with pytest.raises(KeyError):
+        root["item2"]
+    assert root["item4"] == item

@@ -111,6 +111,9 @@ class JsonNode(AbstractJsonItem):
         child.parent = self
         bisect.insort(self.__children, (child.key, child))
 
+    def clear(self):
+        self.__children.clear()
+
     def from_json(self, jsonstr):
         try:
             jsondata = json.loads(jsonstr)

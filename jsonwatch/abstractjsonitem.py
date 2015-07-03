@@ -38,12 +38,13 @@ class AbstractJsonItem:
     """
     def __init__(self, key):
         self.parent = None
-        self.key = key
+        self._key = key
         self.name = ""
 
     def __eq__(self, other):
         return type(self) == type(other) and self.path == other.path
 
+    # path property
     @property
     def path(self):
         """
@@ -60,4 +61,18 @@ class AbstractJsonItem:
             return path
 
         return list(iter_keys(self))
+
+    # key property
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, value):
+        if self.parent is None: return
+        self.parent.remove(self.key)
+        self._key = value
+        self.parent.add(self)
+
+
 
