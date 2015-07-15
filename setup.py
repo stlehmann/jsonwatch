@@ -5,6 +5,7 @@ import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
+import versioneer
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -20,7 +21,7 @@ class PyTest(TestCommand):
 
 setup(
     name='jsonwatch',
-    version='0.0.1',
+    version=versioneer.get_version(),
     packages=['jsonwatch'],
     url='https://github.com/MrLeeh/jsonwatch',
     license='MIT license',
@@ -28,7 +29,7 @@ setup(
     author_email='Stefan.St.Lehmann@gmail.com',
     description='keep track of json data',
     tests_require=['pytest'],
-    cmdclass={'test': PyTest},
+    cmdclass=versioneer.get_cmdclass(),# {'test': PyTest},
     install_requires=['jsonpickle>=0.9.0'],
     platforms='any'
 )
