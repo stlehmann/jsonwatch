@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   jsonwatch.rst
 
 
 Indices and tables
