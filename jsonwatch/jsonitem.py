@@ -13,7 +13,7 @@ class JsonItem(AbstractJsonItem):
     def __init__(self, key, **kwargs):
         super().__init__(key)
         self._raw_value = None
-        self.readonly = kwargs.get('readonly', True)
+        self.readonly = kwargs.get('readonly', False)
         self.name = kwargs.get('name', "")
         self.unit = kwargs.get('unit', "")
         self.decimals = kwargs.get('decimals', 0)
