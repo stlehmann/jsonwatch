@@ -147,7 +147,7 @@ def test_corruptjson():
         ''')
     assert 'corrupt json string' in str(e)
 
-def test_latest(nested_json):
+def test_up_to_date(nested_json):
     node = nested_json
     new_json_string = ('{'
                        '  "root": {\n'
@@ -158,11 +158,11 @@ def test_latest(nested_json):
                        '  }\n'
                        '}')
     node.from_json(new_json_string)
-    assert node["item1"].latest
-    assert not node["item2"].latest
-    assert node["item3"].latest
-    assert node["item3"]["item1"].latest
-    assert not node["item3"]["item2"].latest
+    assert node["item1"].up_to_date
+    assert not node["item2"].up_to_date
+    assert node["item3"].up_to_date
+    assert node["item3"]["item1"].up_to_date
+    assert not node["item3"]["item2"].up_to_date
 
 def test_item_from_path(nested_json):
     node = nested_json

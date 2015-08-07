@@ -31,7 +31,7 @@ class JsonNode(AbstractJsonItem):
         """
         super().__init__(key)
         self.child_added_callback = None
-        self.latest = True
+        self.up_to_date = True
         self.__children = []
 
     def __len__(self):
@@ -51,13 +51,13 @@ class JsonNode(AbstractJsonItem):
                (self.key, len(self))
 
     def __from_dict(self, jsondict):
-        def iter_reset_latest(parent):
+        def iter_up_to_date(parent):
             for key, child in parent.__children:
-                child.latest = False
-                if isinstance(child, JsonNode): iter_reset_latest(child)
+                child.up_to_date = False
+                if isinstance(child, JsonNode): iter_up_to_date(child)
 
         # reset the *latest* flag of all children
-        iter_reset_latest(self)
+        iter_up_to_date(self)
 
         for key, value in jsondict.items():
             child = self.item_with_key(key)
@@ -83,9 +83,9 @@ class JsonNode(AbstractJsonItem):
                 elif isinstance(child, JsonItem):
                     child._raw_value = value
                     child.type = child.type or type_to_str(type(value))
-                    child.latest = True
+                    child.up_to_date = True
 
-        self.latest = True
+        self.up_to_date = True
 
     def __to_dict(self):
         def iter_children(node):

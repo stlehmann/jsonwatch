@@ -21,7 +21,7 @@ class JsonItem(AbstractJsonItem):
         self.max = kwargs.get('max', None)
         self.scalefactor = kwargs.get('scalefactor', 1)
         self.type = kwargs.get('type', None)
-        self.latest = True
+        self.up_to_date = True
 
     def __repr__(self):
         return "<JsonItem object key:'%s', value: '%s'>" % \
