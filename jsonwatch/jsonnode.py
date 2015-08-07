@@ -7,23 +7,29 @@
 import json
 import bisect
 
-from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
-    set_in_dict, type_to_str
+from jsonwatch.abstractjsonitem import AbstractJsonItem, \
+    nested_dict_from_list, set_in_dict, type_to_str
 from jsonwatch.jsonitem import JsonItem
 
-key = lambda x: x[0]
-itm = lambda x: x[1]
+
+def key(x):
+    return x[0]
+
+
+def itm(x):
+    return x[1]
 
 
 class JsonNode(AbstractJsonItem):
+
     """
     This is a json object containing other objects or properties. It is
     identified by a key.
 
     """
-    def __init__(self, key: str):
-        """
 
+    def __init__(self, key: str=""):
+        """
         :param str key: name of the object
         :param str jsonstr: json string for the objects and properties of
                             this object
@@ -54,7 +60,8 @@ class JsonNode(AbstractJsonItem):
         def iter_up_to_date(parent):
             for key, child in parent.__children:
                 child.up_to_date = False
-                if isinstance(child, JsonNode): iter_up_to_date(child)
+                if isinstance(child, JsonNode):
+                    iter_up_to_date(child)
 
         # reset the *latest* flag of all children
         iter_up_to_date(self)
@@ -120,16 +127,11 @@ class JsonNode(AbstractJsonItem):
         except ValueError as e:
             raise ValueError("corrupt json string") from e
 
-        try:
-            jsondata = jsondata[self.key]
-        except KeyError as e:
-            raise KeyError("wrong root key") from e
-
         self.__from_dict(jsondata)
 
     def to_json(self):
         jsondict = self.__to_dict()
-        jsonstr = json.dumps(jsondict)
+        jsonstr = json.dumps(jsondict[self.key])
         return jsonstr
 
     @property

@@ -11,7 +11,8 @@ def nested_dict_from_list(parents, dict_={}):
 
 
 def set_in_dict(data_dict, maplist, value):
-    for k in maplist[:-1]: data_dict = data_dict[k]
+    for k in maplist[:-1]:
+        data_dict = data_dict[k]
     data_dict[maplist[-1]] = value
 
 

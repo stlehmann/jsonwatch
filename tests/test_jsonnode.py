@@ -8,15 +8,15 @@ from jsonwatch.jsonitem import JsonItem
 from jsonwatch.jsonnode import JsonNode
 
 
-simple_json_string = '{"root": {"item1": 1, "item2": 2}}'
-nested_json_string = ('{"root": {\n'
-                      '    "item1": 1,\n'
-                      '    "item2": 2,\n'
-                      '    "item3": {\n'
-                      '        "item1": 1,\n'
-                      '        "item2": 2\n'
-                      '    }\n'
-                      '}}')
+simple_json_string = '{"item1": 1, "item2": 2}'
+nested_json_string = ('{\n'
+                      '  "item1": 1,\n'
+                      '  "item2": 2,\n'
+                      '  "item3": {\n'
+                      '      "item1": 1,\n'
+                      '      "item2": 2\n'
+                      '  }\n'
+                      '}')
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def test_simple_values(simple_json):
 
 def test_simple_updateitems(simple_json):
     node = simple_json
-    node.from_json('{"root": {"item1": 3, "item2": 4}}')
+    node.from_json('{"item1": 3, "item2": 4}')
     assert node["item1"].value == 3
     assert node["item2"].value == 4
 
@@ -81,13 +81,11 @@ def test_nested_update(nested_json):
     node = nested_json
     new_json = '''
     {
-      "root": {
-        "item2": 3,
-        "item1": 2,
-        "item3": {
-          "item1": 4,
-          "item2": 5
-        }
+      "item2": 3,
+      "item1": 2,
+      "item3": {
+        "item1": 4,
+        "item2": 5
       }
     }'''
     node.from_json(new_json)
@@ -99,10 +97,9 @@ def test_nested_update(nested_json):
 def test_keys(nested_json):
     node = nested_json
     new_json = '''
-    {"root": {
-        "first": 10,
-        "last": 20
-      }
+    {
+      "first": 10,
+      "last": 20
     }
     '''
     node.from_json(new_json)
@@ -150,11 +147,9 @@ def test_corruptjson():
 def test_up_to_date(nested_json):
     node = nested_json
     new_json_string = ('{'
-                       '  "root": {\n'
-                       '    "item1": 1,\n'
-                       '    "item3": {\n'
-                       '      "item1": 1\n'
-                       '    }\n'
+                       '  "item1": 1,\n'
+                       '  "item3": {\n'
+                       '    "item1": 1\n'
                        '  }\n'
                        '}')
     node.from_json(new_json_string)
@@ -201,7 +196,7 @@ def test_remove(nested_json):
     assert "'item1' not in list" in str(e)
 
 def test_dump():
-    root = JsonNode('root')
+    root = JsonNode()
     root.add(JsonItem('a', name='item1'))
     root.add(JsonNode('b'))
 
@@ -211,7 +206,7 @@ def test_dump():
     assert jsondict['b']['__node__'] == True
 
 def test_load():
-    root = JsonNode('root')
+    root = JsonNode()
     jsonstr = '''{
                     "a": {
                         "denominator": 1,

@@ -8,14 +8,12 @@ from jsonwatch.jsonitem import JsonItem
 from jsonwatch.jsonnode import JsonNode
 
 
-nested_json_string = ('{"root":\n'
-                      '  {\n'
-                      '    "item1": 1,\n'
-                      '    "item2": 2,\n'
-                      '    "item3": {\n'
-                      '        "item1": 1,\n'
-                      '        "item2": 2\n'
-                      '    }\n'
+nested_json_string = ('{\n'
+                      '  "item1": 1,\n'
+                      '  "item2": 2,\n'
+                      '  "item3": {\n'
+                      '      "item1": 1,\n'
+                      '      "item2": 2\n'
                       '  }\n'
                       '}')
 

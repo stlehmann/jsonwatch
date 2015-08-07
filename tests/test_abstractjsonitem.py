@@ -6,16 +6,15 @@
 import pytest
 from jsonwatch.jsonitem import JsonItem
 
-nested_json_string = ('{"root":\n'
-                      '  {\n'
+nested_json_string = ('{\n'
                       '    "item1": 1,\n'
                       '    "item2": 2,\n'
                       '    "item3": {\n'
                       '        "item1": 1,\n'
                       '        "item2": 2\n'
                       '    }\n'
-                      '  }\n'
-                      '}')
+                      '}\n'
+                      )
 
 @pytest.fixture
 def nested_json():
@@ -23,7 +22,6 @@ def nested_json():
     node = JsonNode('root')
     node.from_json(nested_json_string)
     return node
-
 
 def test_path(nested_json):
     root = nested_json

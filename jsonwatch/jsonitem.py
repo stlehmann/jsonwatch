@@ -99,5 +99,6 @@ class JsonItem(AbstractJsonItem):
     def to_json(self):
         jsondict = nested_dict_from_list(self.path)
         set_in_dict(jsondict, self.path, self._raw_value)
-        jsonstr = json.dumps(jsondict)
+        _, rootdict = next(iter(jsondict.items()))
+        jsonstr = json.dumps(rootdict)
         return jsonstr
