@@ -37,7 +37,7 @@ class JsonNode(AbstractJsonItem):
         """
         super().__init__(key)
         self.child_added_callback = None
-        self.up_to_date = True
+        self.up_to_date = False
         self.__children = []
 
     def __len__(self):
