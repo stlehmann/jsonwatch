@@ -25,11 +25,11 @@ class SerialConnection(Connection):
     def disconnect(self):
         self.serial.close()
 
-    def read(self, size=1):
-        return self.serial.read(size)
-
-    def write(data):
+    def send(self, data):
         return self.serial.write(data)
+
+    def receive(self, size=1):
+        return self.serial.read(size)
 
 
 class SocketConnection(Connection):
@@ -39,3 +39,12 @@ class SocketConnection(Connection):
 
     def connect(self, host=None, port=None):
         self.socket.connect((host, port))
+
+    def disconnect(self):
+        self.socket.close()
+
+    def send(self, data: bytes):
+        return self.socket.send(bytes)
+
+    def receive(self):
+        return self.socket.recvfrom(4096)
