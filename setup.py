@@ -3,20 +3,7 @@
 
 import sys
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
-
 import versioneer
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = ['--strict', '--verbose', '--tb=long', 'tests']
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
 
 
 setup(
@@ -28,6 +15,7 @@ setup(
     author='Stefan Lehmann',
     author_email='Stefan.St.Lehmann@gmail.com',
     description='keep track of json data',
+    setup_requires=['pytest_runner'],
     tests_require=['pytest'],
     cmdclass=versioneer.get_cmdclass(),# {'test': PyTest},
     install_requires=['jsonpickle>=0.9.0'],
