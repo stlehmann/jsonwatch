@@ -5,6 +5,7 @@
 
 """
 import json
+import datetime
 import atexit
 import logging
 import threading
@@ -203,8 +204,9 @@ class TimerThread(threading.Thread):
             try:
                 data = json.dumps({
                     'a': 1,
-                    'b': 2
+                    'time': str(datetime.datetime.now())
                 })
+                data += '\n'
                 self.client.send(data.encode())
                 logger.info('Sent {data} to {adr[0]}:{adr[1]}'.format(
                     data=data, adr=self.client_address))
