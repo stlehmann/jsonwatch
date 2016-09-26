@@ -60,3 +60,5 @@ target/
 .idea/
 notebooks/
 notes.md
+jsonwatch.sublime-workspace
+jsonwatch.sublime-project
