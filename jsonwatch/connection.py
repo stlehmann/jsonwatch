@@ -28,7 +28,7 @@ class SerialConnection(Connection):
     def read(self, size=1):
         return self.serial.read(size)
 
-    def write(data):
+    def write(self, data):
         return self.serial.write(data)
 
 
