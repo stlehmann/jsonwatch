@@ -3,10 +3,9 @@
     Contains the JsonItem class.
 
 """
-
 import json
-from jsonwatch.abstractjsonitem import AbstractJsonItem, nested_dict_from_list, \
-    set_in_dict, type_from_str
+from jsonwatch.abstractjsonitem import AbstractJsonItem, \
+    nested_dict_from_list, set_in_dict, type_from_str
 
 
 class JsonItem(AbstractJsonItem):
@@ -44,7 +43,7 @@ class JsonItem(AbstractJsonItem):
                       'scalefactor', 'type']
 
         return dict((attr, getattr(self, attr)) for attr in attributes
-                 if getattr(self, attr) is not None)
+                    if getattr(self, attr) is not None)
 
     # value property
     @property

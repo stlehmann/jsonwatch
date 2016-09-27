@@ -202,3 +202,7 @@ class JsonNode(AbstractJsonItem):
     def load(self, string):
         jsondict = json.loads(string)
         self._load_config_from_dict(jsondict)
+
+    @property
+    def children(self):
+        return [child for (key, child) in self.__children]

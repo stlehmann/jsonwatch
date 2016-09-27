@@ -27,7 +27,7 @@ class JsonWatch:
     def disconnect(self):
         self._connection_thread.stop()
 
-    def print_tree(self):
+    def tree(self):
         def _print_tree(level, _node):
             for child in _node:
                 print('  ' * level + '|- ' + child.key + ': ' + str(child.value))
@@ -36,6 +36,7 @@ class JsonWatch:
 
         print('\nroot')
         _print_tree(1, self.root)
+        print('\n')
 
 
 if __name__ == '__main__':
@@ -44,5 +45,4 @@ if __name__ == '__main__':
     conn = connection.SocketConnection(('localhost', 5000))
     watcher = JsonWatch(conn)
     time.sleep(2)
-    watcher.print_tree()
-    watcher.disconnect()
+    watcher.tree()
