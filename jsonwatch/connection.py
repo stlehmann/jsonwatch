@@ -107,6 +107,9 @@ class ConnectionThread(threading.Thread):
         self._clear_messages = True
         return self._messages[:]
 
+    def stop(self):
+        self._run = False
+
 
 def new_messages(sender):
     messages = sender.get_messages()
